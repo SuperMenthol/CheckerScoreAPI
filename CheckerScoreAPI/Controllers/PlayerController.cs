@@ -41,8 +41,7 @@ namespace CheckerScoreAPI.Controllers
         {
             try
             {
-                var nameAvailable = IsPlayerNameAvailable(playerName);
-                if (!nameAvailable)
+                if (IsPlayerNameAvailable(playerName) is false)
                 {
                     return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
                 }
@@ -71,18 +70,33 @@ namespace CheckerScoreAPI.Controllers
         [HttpPut("rename")]
         public ActionResult RenamePlayer(PlayerModel player)
         {
-            if (player.PlayerId == 0 || !DoesPlayerIDExist(player.PlayerId))
+            try
             {
-                return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
-            }
+                if (player.PlayerId == 0 || DoesPlayerIDExist(player.PlayerId) is false)
+                {
+                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                }
 
-            var validateName = ValidatePlayerName(player.PlayerName);
-            if (validateName.Success is false)
+                if (IsPlayerNameAvailable(player.PlayerName) is false)
+                {
+                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
+                }
+
+                var validateName = ValidatePlayerName(player.PlayerName);
+                if (validateName.Success is false)
+                {
+                    return new JsonResult(validateName);
+                }
+
+                _dataContext.UpdatePlayer(player.ToEntity());
+
+                return new JsonResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
+            }
+            catch (Exception ex)
             {
-                return new JsonResult(validateName);
+                _logger.LogError(ex.ToString());
+                return new JsonResult(new BaseResponse(false, ex.ToString()));
             }
-
-            return new JsonResult(new object());
         }
 
         [HttpDelete("remove")]
@@ -114,14 +128,8 @@ namespace CheckerScoreAPI.Controllers
             return new BaseResponse(true, Helpers.ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE);
         }
 
-        private bool IsPlayerNameAvailable(string playerName)
-        {
-            return true;
-        }
+        private bool IsPlayerNameAvailable(string playerName) => _dataContext.GetPlayerByName(playerName) == null;
 
-        private bool DoesPlayerIDExist(int playerId)
-        {
-            return true;
-        }
+        private bool DoesPlayerIDExist(int playerId) => _dataContext.GetPlayerByID(playerId) != null;
     }
 }

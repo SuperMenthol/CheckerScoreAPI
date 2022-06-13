@@ -5,7 +5,7 @@ namespace CheckerScoreAPI.Helpers
 {
     public static class Validators
     {
-        private const string NAME_REGEX = @"\W";
+        private const string NAME_REGEX = @"[^a-zA-Z0-9]";
 
         private const int playerNameMaxLength = 20;
 
