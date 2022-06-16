@@ -1,5 +1,6 @@
 ﻿using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
+using CheckerScoreAPI.Queries.MatchQueries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CheckerScoreAPI.Controllers
@@ -17,23 +18,53 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpGet("getMatchResults")]
-        public ActionResult GetPlayerResults(int playerId)
-        {
-            return new JsonResult(new object());
-        }
-
-        [HttpPost("postresult")]
-        public ActionResult PostMatchResult(MatchResult result)
+        public async Task<ObjectResult> GetPlayerResults(int playerId)
         {
             try
             {
-                _dataContext.AddMatchResult(result.ToEntity());
-                return new JsonResult(new BaseResponse(true, Helpers.ResponseMessages.MATCH_RESULT_POSTED));
+                return await new GetPlayerResultsQueryAsync(_dataContext, playerId).Get();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new JsonResult(new BaseResponse(false, ex.ToString()));
+                return new ObjectResult(
+                    new BaseResponse(false, Helpers.ResponseMessages.RESULTS_FAILURE))
+                    {
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+            }
+        }
+
+        [HttpGet("getPlayerSummary")]
+        public async Task<ObjectResult> GetPlayerSummary(int playerId)
+        {
+            try
+            {
+                return await new GetPlayerResultCardQueryAsync(_dataContext, playerId).Get();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return new ObjectResult(
+                    new BaseResponse(false, Helpers.ResponseMessages.SUMMARY_FAILURE)) 
+                        { 
+                            StatusCode = StatusCodes.Status500InternalServerError 
+                        };
+            }
+        }
+
+        [HttpPost("postresult")]
+        public ObjectResult PostMatchResult(MatchResult result)
+        {
+            try
+            {
+                _dataContext.AddMatchResult(result.ToEntity());
+                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.MATCH_RESULT_POSTED));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return new ObjectResult(new BaseResponse(false, ex.ToString()));
             }
         }
     }

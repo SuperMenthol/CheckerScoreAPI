@@ -1,5 +1,6 @@
 ﻿using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
+using CheckerScoreAPI.Queries.PlayerQueries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CheckerScoreAPI.Controllers
@@ -18,96 +19,102 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpGet("getInfo")]
-        public ActionResult GetPlayerInfo(int playerId)
+        public ObjectResult GetPlayerInfo(int playerId)
         {
             try
             {
                 if (playerId == 0)
                 {
-                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
                 }
 
-                return new JsonResult(_dataContext.GetPlayerInformation(playerId));
+                return new GetPlayerByIdQuery(_dataContext, playerId).Get();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new JsonResult(new BaseResponse(false, ex.ToString()));
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_INFO_FAILURE))
+                    {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                    };
             }
         }
 
         [HttpPost("create")]
-        public ActionResult CreatePlayer(string playerName)
+        public ObjectResult CreatePlayer(string playerName)
         {
             try
             {
                 if (IsPlayerNameAvailable(playerName) is false)
                 {
-                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
                 }
                 var nameValidationResult = Helpers.Validators.IsPlayerNameValid(playerName);
                 if (nameValidationResult.Success is false)
                 {
-                    return new JsonResult(nameValidationResult);
+                    return new ObjectResult(nameValidationResult);
                 }
 
-                var playerDto = new PlayerModel()
-                {
-                    PlayerId = _dataContext.GetLastPlayerID() + 1,
-                    PlayerName = playerName
-                };
+                int nextPlayerId = (int)new GetNextPlayerIDQuery(_dataContext).Get().Value;
+                var playerDto = new PlayerModel(nextPlayerId, playerName, DateTime.Now);
 
                 _dataContext.AddPlayer(playerDto.ToEntity());
-                return new JsonResult(new BaseResponse(true, Helpers.ResponseMessages.INSERT_PLAYER_SUCCEEDED));
+                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.INSERT_PLAYER_SUCCEEDED));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.INSERT_PLAYER_FAILED));
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.INSERT_PLAYER_FAILED))
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
         }
 
         [HttpPut("rename")]
-        public ActionResult RenamePlayer(PlayerModel player)
+        public ObjectResult RenamePlayer(PlayerModel player)
         {
             try
             {
                 if (player.PlayerId == 0 || DoesPlayerIDExist(player.PlayerId) is false)
                 {
-                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
                 }
 
                 if (IsPlayerNameAvailable(player.PlayerName) is false)
                 {
-                    return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
                 }
 
                 var validateName = ValidatePlayerName(player.PlayerName);
                 if (validateName.Success is false)
                 {
-                    return new JsonResult(validateName);
+                    return new ObjectResult(validateName);
                 }
 
                 _dataContext.UpdatePlayer(player.ToEntity());
 
-                return new JsonResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
+                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new JsonResult(new BaseResponse(false, ex.ToString()));
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_RENAME_FAILURE))
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
         }
 
         [HttpDelete("remove")]
-        public ActionResult RemovePlayer(int playerId)
+        public ObjectResult RemovePlayer(int playerId)
         {
             if (DoesPlayerIDExist(playerId) is false)
             {
-                return new JsonResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
             }
 
-            return new JsonResult(new object());
+            return new ObjectResult(new object());
         }
 
         private BaseResponse ValidatePlayerName(string name)
@@ -128,8 +135,8 @@ namespace CheckerScoreAPI.Controllers
             return new BaseResponse(true, Helpers.ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE);
         }
 
-        private bool IsPlayerNameAvailable(string playerName) => _dataContext.GetPlayerByName(playerName) == null;
+        private bool IsPlayerNameAvailable(string playerName) => new GetPlayerByNameQuery(_dataContext, playerName).Get().Value == null;
 
-        private bool DoesPlayerIDExist(int playerId) => _dataContext.GetPlayerByID(playerId) != null;
+        private bool DoesPlayerIDExist(int playerId) => new GetPlayerByIdQuery(_dataContext, playerId).Get().Value != null;
     }
 }

@@ -1,12 +1,12 @@
 ﻿using CheckerScoreAPI.Controllers;
 using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Model.Entity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System;
 
 namespace CheckerScoreAPI.Tests.PlayerTests
 {
@@ -20,10 +20,6 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         {
             var mockContext = new Mock<IDataContext>();
 
-            mockContext.Setup(x => x.GetPlayerByName("samename")).Returns(new Player() { });
-            mockContext.Setup(x => x.GetPlayerByName("noname")).Returns(new Player() { });
-            mockContext.Setup(x => x.GetPlayerByID(3)).Returns(new Player() { });
-
             _playerController = new PlayerController(new Mock<ILogger<PlayerController>>().Object, mockContext.Object);
             _matchController = new MatchController(new Mock<ILogger<MatchController>>().Object, mockContext.Object);
         }
@@ -33,7 +29,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         {
             var playerModel = new PlayerModel()
             {
-                PlayerName = "supername"
+                PlayerName = "supername",
+                CreatedAt = DateTime.Now
             };
 
             var action = _playerController.RenamePlayer(playerModel);
@@ -45,11 +42,7 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         [Test]
         public void RenamePlayer_NameExists_ShouldBeFalse()
         {
-            var playerModel = new PlayerModel()
-            {
-                PlayerId = 1,
-                PlayerName = "samename"
-            };
+            var playerModel = new PlayerModel(1, "usertwo", DateTime.Now);
 
             var action = _playerController.RenamePlayer(playerModel);
             dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
@@ -60,11 +53,7 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         [Test]
         public void RenamePlayer_NotValidName_ShouldBeFalse()
         {
-            var playerModel = new PlayerModel()
-            {
-                PlayerId = 1,
-                PlayerName = "notvבְname"
-            };
+            var playerModel = new PlayerModel(1, "notvבְname", DateTime.Now);
 
             var action = _playerController.RenamePlayer(playerModel);
             dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
@@ -75,11 +64,7 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         [Test]
         public void RenamePlayer_EmptyName_ShouldBeFalse()
         {
-            var playerModel = new PlayerModel()
-            {
-                PlayerId = 1,
-                PlayerName = string.Empty
-            };
+            var playerModel = new PlayerModel(1, string.Empty, DateTime.Now);
 
             var action = _playerController.RenamePlayer(playerModel);
             dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
@@ -90,11 +75,7 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         [Test]
         public void RenamePlayer_ValidName_ShouldBeTrue()
         {
-            var playerModel = new PlayerModel()
-            {
-                PlayerId = 3,
-                PlayerName = "newname"
-            };
+            var playerModel = new PlayerModel(3, "newname", DateTime.Now);
 
             var action = _playerController.RenamePlayer(playerModel);
             dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
