@@ -7,8 +7,8 @@ namespace CheckerScoreAPI.Data
 {
     public class DataContext : IDataContext
     {
-        public IMongoCollection<Player> Players() => _players;
-        public IMongoCollection<Result> Results() => _results;
+        public IMongoCollection<Player> Players => _players;
+        public IMongoCollection<Result> Results => _results;
 
         private readonly IMongoCollection<Player> _players;
         private readonly IMongoCollection<Result> _results;

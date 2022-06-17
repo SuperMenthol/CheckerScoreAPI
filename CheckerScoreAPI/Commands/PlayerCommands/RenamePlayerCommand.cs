@@ -21,7 +21,7 @@ namespace CheckerScoreAPI.Commands.PlayerCommands
             var upd = new UpdateDefinitionBuilder<Player>();
             upd.Set(x => x.Login, _playerModel.PlayerName);
 
-            await _dataContext.Players().UpdateOneAsync(_filter, upd.Combine());
+            await _dataContext.Players.UpdateOneAsync(_filter, upd.Combine());
 
             return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
         }

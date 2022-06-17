@@ -1,6 +1,5 @@
 ﻿using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Model.Entity;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 
@@ -19,7 +18,7 @@ namespace CheckerScoreAPI.Queries.PlayerQueries
 
         public override ObjectResult Get()
         {
-            var player = _dataContext.Players().FindSync(_filter).FirstOrDefault();
+            var player = _dataContext.Players.FindSync(_filter).FirstOrDefault();
             if (player != null)
             {
                 return new ObjectResult(new PlayerModel(player));

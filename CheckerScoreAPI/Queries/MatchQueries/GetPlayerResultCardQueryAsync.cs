@@ -22,7 +22,7 @@ namespace CheckerScoreAPI.Queries.MatchQueries
 
         public override async Task<ObjectResult> Get()
         {
-            Model.Entity.Player playerInfo = (Model.Entity.Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
+            Player playerInfo = (Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
 
             if (playerInfo == null)
             {
@@ -36,7 +36,7 @@ namespace CheckerScoreAPI.Queries.MatchQueries
                 CreatedAt = playerInfo.CreationDate
             };
 
-            var allMatches = await _dataContext.Results().FindAsync(_filter).Result.ToListAsync();
+            var allMatches = await _dataContext.Results.FindAsync(_filter).Result.ToListAsync();
 
             if (allMatches.Any() is false)
             {

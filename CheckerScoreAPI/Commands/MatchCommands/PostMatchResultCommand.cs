@@ -18,7 +18,7 @@ namespace CheckerScoreAPI.Commands.MatchCommands
         {
             var entity = _result.ToEntity();
 
-            await _dataContext.Results().InsertOneAsync(entity);
+            await _dataContext.Results.InsertOneAsync(entity);
 
             return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.MATCH_RESULT_POSTED));
         }

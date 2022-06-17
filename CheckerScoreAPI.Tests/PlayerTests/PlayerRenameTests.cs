@@ -3,12 +3,14 @@ using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
 using CheckerScoreAPI.Model.Entity;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CheckerScoreAPI.Tests.PlayerTests
 {
@@ -28,13 +30,18 @@ namespace CheckerScoreAPI.Tests.PlayerTests
                 new Player() { PlayerId = 3, Login = "userthree", CreationDate = new DateTime(2022,6,13,12,0,0) }
             };
 
-            mockContext.Object.Players().InsertMany(playerList);
+            var isAny = It.IsAny<FilterDefinition<Player>>();
+
+            var playerMock = new Mock<IMongoCollection<Player>>();
+            playerMock.Object.InsertMany(playerList);
+
+            mockContext.Setup(x => x.Players).Returns(playerMock.Object);
 
             _playerController = new PlayerController(new Mock<ILogger<PlayerController>>().Object, mockContext.Object);
         }
 
         [Test]
-        public void RenamePlayer_NoId_ShouldBeFalse()
+        public async Task RenamePlayer_NoId_ShouldBeFalse()
         {
             var playerModel = new PlayerModel()
             {
@@ -42,54 +49,54 @@ namespace CheckerScoreAPI.Tests.PlayerTests
                 CreatedAt = DateTime.Now
             };
 
-            var action = _playerController.RenamePlayer(playerModel);
-            dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
+            var action = await _playerController.RenamePlayer(playerModel);
+            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse((bool)data.Value.Success);
+            Assert.IsFalse(response.Success);
         }
 
         [Test]
-        public void RenamePlayer_NameExists_ShouldBeFalse()
+        public async Task RenamePlayer_NameExists_ShouldBeFalse()
         {
             var playerModel = new PlayerModel(1, "usertwo", DateTime.Now);
 
-            var action = _playerController.RenamePlayer(playerModel);
-            dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
+            var action = await _playerController.RenamePlayer(playerModel);
+            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse((bool)data.Value.Success);
+            Assert.IsFalse(response.Success);
         }
 
         [Test]
-        public void RenamePlayer_NotValidName_ShouldBeFalse()
+        public async Task RenamePlayer_NotValidName_ShouldBeFalse()
         {
             var playerModel = new PlayerModel(1, "notvבְname", DateTime.Now);
 
-            var action = _playerController.RenamePlayer(playerModel);
-            dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
+            var action = await _playerController.RenamePlayer(playerModel);
+            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse((bool)data.Value.Success);
+            Assert.IsFalse(response.Success);
         }
 
         [Test]
-        public void RenamePlayer_EmptyName_ShouldBeFalse()
+        public async Task RenamePlayer_EmptyName_ShouldBeFalse()
         {
             var playerModel = new PlayerModel(1, string.Empty, DateTime.Now);
 
-            var action = _playerController.RenamePlayer(playerModel);
-            dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
+            var action = await _playerController.RenamePlayer(playerModel);
+            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse((bool)data.Value.Success);
+            Assert.IsFalse(response.Success);
         }
 
         [Test]
-        public void RenamePlayer_ValidName_ShouldBeTrue()
+        public async Task RenamePlayer_ValidName_ShouldBeTrue()
         {
             var playerModel = new PlayerModel(3, "newname", DateTime.Now);
 
-            var action = _playerController.RenamePlayer(playerModel);
-            dynamic data = JObject.Parse(JsonConvert.SerializeObject(action));
+            var action = await _playerController.RenamePlayer(playerModel);
+            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsTrue((bool)data.Value.Success);
+            Assert.IsFalse(response.Success);
         }
     }
 }

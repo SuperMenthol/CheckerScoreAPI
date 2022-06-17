@@ -19,7 +19,7 @@ namespace CheckerScoreAPI.Queries.PlayerQueries
 
         public override ObjectResult Get()
         {
-            var player = _dataContext.Players().Find(_filter).SortBy(x => x.CreationDate).FirstOrDefault();
+            var player = _dataContext.Players.Find(_filter).SortBy(x => x.CreationDate).FirstOrDefault();
             if (player != null)
             {
                 return new ObjectResult(new PlayerModel(player));

@@ -12,7 +12,7 @@ namespace CheckerScoreAPI.Queries.PlayerQueries
         }
         public override ObjectResult Get()
         {
-            int result = _dataContext.Players().AsQueryable()
+            int result = _dataContext.Players.AsQueryable()
                 .OrderByDescending(p => p.PlayerId)
                 .FirstOrDefault()?.PlayerId + 1 ?? 1;
 

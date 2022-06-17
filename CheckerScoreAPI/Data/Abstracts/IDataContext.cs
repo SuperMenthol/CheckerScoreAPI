@@ -5,7 +5,7 @@ namespace CheckerScoreAPI.Data.Abstracts
 {
     public interface IDataContext
     {
-        IMongoCollection<Result> Results();
-        IMongoCollection<Player> Players();
+        IMongoCollection<Result> Results { get; }
+        IMongoCollection<Player> Players { get; }
     }
 }

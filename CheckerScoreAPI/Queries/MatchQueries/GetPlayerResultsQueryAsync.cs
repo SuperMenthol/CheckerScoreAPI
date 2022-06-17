@@ -21,7 +21,7 @@ namespace CheckerScoreAPI.Queries.MatchQueries
 
         public override async Task<ObjectResult> Get()
         {
-            var playerResults = await _dataContext.Results().FindAsync(_filter).Result.ToListAsync();
+            var playerResults = await _dataContext.Results.FindAsync(_filter).Result.ToListAsync();
 
             var dtoList = playerResults.OrderByDescending(x => x.PlayedAt).Select(x => new MatchResult()
             {
