@@ -1,18 +1,19 @@
 ﻿using CheckerScoreAPI.Controllers;
 using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
+using CheckerScoreAPI.Model.Entity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace CheckerScoreAPI.Tests.PlayerTests
 {
     public class PlayerRenameTests
     {
-        MatchController _matchController;
         PlayerController _playerController;
 
         [SetUp]
@@ -20,8 +21,16 @@ namespace CheckerScoreAPI.Tests.PlayerTests
         {
             var mockContext = new Mock<IDataContext>();
 
+            var playerList = new List<Player>()
+            {
+                new Player() { PlayerId = 1, Login = "userone", CreationDate = new DateTime(2022,6,1,12,0,0) },
+                new Player() { PlayerId = 2, Login = "usertwo", CreationDate = new DateTime(2022,6,1,14,43,0) },
+                new Player() { PlayerId = 3, Login = "userthree", CreationDate = new DateTime(2022,6,13,12,0,0) }
+            };
+
+            mockContext.Object.Players().InsertMany(playerList);
+
             _playerController = new PlayerController(new Mock<ILogger<PlayerController>>().Object, mockContext.Object);
-            _matchController = new MatchController(new Mock<ILogger<MatchController>>().Object, mockContext.Object);
         }
 
         [Test]

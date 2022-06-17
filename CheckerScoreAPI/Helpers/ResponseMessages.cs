@@ -2,12 +2,13 @@
 {
     public static class ResponseMessages // TO DO: EXPORT TO FILE
     {
-        public const string INSERT_PLAYER_FAILED = "Creating new player was not possible";
-        public const string INSERT_PLAYER_SUCCEEDED = "Player created successfully";
+        public const string CREATE_PLAYER_FAILED = "Creating new player was not possible";
+        public const string CREATE_PLAYER_SUCCEEDED = "Player created successfully";
 
         public const string RENAME_PLAYER_SUCCEEDED = "Player successfully renamed";
 
         public const string MATCH_RESULT_POSTED = "Match result posted successfully";
+        public const string MATCH_POST_FAILURE = "It was not possible to post match result";
 
         public const string PLAYER_ID_INVALID = "This player ID is not valid";
 

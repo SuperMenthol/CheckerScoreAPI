@@ -1,4 +1,5 @@
-﻿using CheckerScoreAPI.Data.Abstracts;
+﻿using CheckerScoreAPI.Commands.PlayerCommands;
+using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
 using CheckerScoreAPI.Queries.PlayerQueries;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpPost("create")]
-        public ObjectResult CreatePlayer(string playerName)
+        public async Task<ObjectResult> CreatePlayer(string playerName)
         {
             try
             {
@@ -56,15 +57,13 @@ namespace CheckerScoreAPI.Controllers
                 }
 
                 int nextPlayerId = (int)new GetNextPlayerIDQuery(_dataContext).Get().Value;
-                var playerDto = new PlayerModel(nextPlayerId, playerName, DateTime.Now);
 
-                _dataContext.AddPlayer(playerDto.ToEntity());
-                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.INSERT_PLAYER_SUCCEEDED));
+                return await new CreatePlayerCommand(_dataContext, new PlayerModel(nextPlayerId, playerName, DateTime.Now)).Execute();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.INSERT_PLAYER_FAILED))
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.CREATE_PLAYER_FAILED))
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
@@ -72,7 +71,7 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpPut("rename")]
-        public ObjectResult RenamePlayer(PlayerModel player)
+        public async Task<ObjectResult> RenamePlayer(PlayerModel player)
         {
             try
             {
@@ -92,9 +91,7 @@ namespace CheckerScoreAPI.Controllers
                     return new ObjectResult(validateName);
                 }
 
-                _dataContext.UpdatePlayer(player.ToEntity());
-
-                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
+                return await new RenamePlayerCommand(_dataContext, player).Execute();
             }
             catch (Exception ex)
             {

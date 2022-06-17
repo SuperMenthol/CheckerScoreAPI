@@ -1,4 +1,6 @@
-﻿using CheckerScoreAPI.Data.Abstracts;
+﻿using CheckerScoreAPI.Commands.MatchCommands;
+using CheckerScoreAPI.Queries.PlayerQueries;
+using CheckerScoreAPI.Data.Abstracts;
 using CheckerScoreAPI.Model;
 using CheckerScoreAPI.Queries.MatchQueries;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,10 @@ namespace CheckerScoreAPI.Controllers
         {
             try
             {
+                if (DoesPlayerIDExist(playerId) is false)
+                {
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                }
                 return await new GetPlayerResultCardQueryAsync(_dataContext, playerId).Get();
             }
             catch (Exception ex)
@@ -54,18 +60,31 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpPost("postresult")]
-        public ObjectResult PostMatchResult(MatchResult result)
+        public async Task<ObjectResult> PostMatchResult(MatchResult result)
         {
             try
             {
-                _dataContext.AddMatchResult(result.ToEntity());
-                return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.MATCH_RESULT_POSTED));
+                if (IsMatchResultValid(result) is false)
+                {
+                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                }
+
+                return await new PostMatchResultCommand(_dataContext, result).Execute();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, ex.ToString()));
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.MATCH_POST_FAILURE));
             }
+        }
+
+        private bool DoesPlayerIDExist(int playerId) => new GetPlayerByIdQuery(_dataContext, playerId).Get().Value != null;
+
+        private bool IsMatchResultValid(MatchResult result)
+        {
+            var validPlayerIds = new int[] {result.Player1Id, result.Player2Id, 0};
+            return DoesPlayerIDExist(result.Player1Id) && DoesPlayerIDExist(result.Player2Id)
+                && validPlayerIds.Contains(result.WinnerID);
         }
     }
 }

@@ -7,9 +7,5 @@ namespace CheckerScoreAPI.Data.Abstracts
     {
         IMongoCollection<Result> Results();
         IMongoCollection<Player> Players();
-        void AddPlayer(Player player);
-        void UpdatePlayer(Player player);
-        void RemovePlayer(Player player);
-        void AddMatchResult(Result result);
     }
 }

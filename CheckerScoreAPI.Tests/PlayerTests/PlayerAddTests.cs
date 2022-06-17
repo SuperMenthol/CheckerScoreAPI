@@ -27,7 +27,7 @@ namespace CheckerScoreAPI.Tests.PlayerTests
                 new Player() { PlayerId = 3, Login = "userthree", CreationDate = new DateTime(2022,6,13,12,0,0) }
             };
 
-            mockContext.Setup(x => x.Players()).Returns(() => playerList); // zrobić tak, żeby było dobrze
+            mockContext.Object.Players().InsertMany(playerList);
 
             _playerController = new PlayerController(new Mock<ILogger<PlayerController>>().Object, mockContext.Object);
         }

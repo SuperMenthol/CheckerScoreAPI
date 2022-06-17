@@ -22,7 +22,7 @@ namespace CheckerScoreAPI.Queries.MatchQueries
 
         public override async Task<ObjectResult> Get()
         {
-            Player playerInfo = (Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
+            Model.Entity.Player playerInfo = (Model.Entity.Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
 
             if (playerInfo == null)
             {
