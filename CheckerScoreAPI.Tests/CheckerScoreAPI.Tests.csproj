@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MatchTests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CheckerScoreAPI\CheckerScoreAPI.csproj" />
   </ItemGroup>
 

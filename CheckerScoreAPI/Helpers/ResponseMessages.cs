@@ -5,6 +5,8 @@
         public const string CREATE_PLAYER_FAILED = "Creating new player was not possible";
         public const string CREATE_PLAYER_SUCCEEDED = "Player created successfully";
 
+        public const string LOGIN_FAILED = "Login failed";
+
         public const string RENAME_PLAYER_SUCCEEDED = "Player successfully renamed";
 
         public const string MATCH_RESULT_POSTED = "Match result posted successfully";

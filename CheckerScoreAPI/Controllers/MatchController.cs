@@ -60,7 +60,7 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpPost("postresult")]
-        public async Task<ObjectResult> PostMatchResult(MatchResult result)
+        public async Task<ObjectResult> PostMatchResult([FromBody] MatchResult result)
         {
             try
             {

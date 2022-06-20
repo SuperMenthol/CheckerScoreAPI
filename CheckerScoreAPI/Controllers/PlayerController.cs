@@ -41,6 +41,20 @@ namespace CheckerScoreAPI.Controllers
             }
         }
 
+        [HttpGet("login")]
+        public async Task<ObjectResult> Login(string playerName)
+        {
+            try
+            {
+                return new GetPlayerByNameQuery(_dataContext, playerName).Get();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.LOGIN_FAILED));
+            }
+        }
+
         [HttpPost("create")]
         public async Task<ObjectResult> CreatePlayer(string playerName)
         {
@@ -71,7 +85,7 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpPut("rename")]
-        public async Task<ObjectResult> RenamePlayer(PlayerModel player)
+        public async Task<ObjectResult> RenamePlayer([FromBody] PlayerModel player)
         {
             try
             {

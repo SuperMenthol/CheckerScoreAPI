@@ -5,8 +5,6 @@ using CheckerScoreAPI.Model.Entity;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -17,23 +15,20 @@ namespace CheckerScoreAPI.Tests.PlayerTests
     public class PlayerRenameTests
     {
         PlayerController _playerController;
+        private List<Player> _playerList = new List<Player>()
+        {
+            new Player() { PlayerId = 1, Login = "userone", CreationDate = new DateTime(2022,6,1,12,0,0) },
+            new Player() { PlayerId = 2, Login = "usertwo", CreationDate = new DateTime(2022,6,1,14,43,0) },
+            new Player() { PlayerId = 3, Login = "userthree", CreationDate = new DateTime(2022,6,13,12,0,0) }
+        };
 
         [SetUp]
         public void Setup()
         {
             var mockContext = new Mock<IDataContext>();
 
-            var playerList = new List<Player>()
-            {
-                new Player() { PlayerId = 1, Login = "userone", CreationDate = new DateTime(2022,6,1,12,0,0) },
-                new Player() { PlayerId = 2, Login = "usertwo", CreationDate = new DateTime(2022,6,1,14,43,0) },
-                new Player() { PlayerId = 3, Login = "userthree", CreationDate = new DateTime(2022,6,13,12,0,0) }
-            };
-
-            var isAny = It.IsAny<FilterDefinition<Player>>();
-
             var playerMock = new Mock<IMongoCollection<Player>>();
-            playerMock.Object.InsertMany(playerList);
+            playerMock.Object.InsertMany(_playerList);
 
             mockContext.Setup(x => x.Players).Returns(playerMock.Object);
 
