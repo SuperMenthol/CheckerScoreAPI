@@ -1,7 +1,6 @@
 ﻿using CheckerScoreAPI.Controllers;
-using CheckerScoreAPI.Data.Abstracts;
-using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Model.Entity;
+using Domain.Data.Abstracts;
+using Domain.Entity;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;

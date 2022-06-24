@@ -1,5 +1,5 @@
-using CheckerScoreAPI.Data;
-using CheckerScoreAPI.Data.Abstracts;
+using Domain.Data;
+using Domain.Data.Abstracts;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerScoreAPI", "CheckerScoreAPI\CheckerScoreAPI.csproj", "{79FF66CD-4BD1-47BD-AB8F-9ABC8ECD17D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckerScoreAPI", "CheckerScoreAPI\CheckerScoreAPI.csproj", "{79FF66CD-4BD1-47BD-AB8F-9ABC8ECD17D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerScoreAPI.Tests", "CheckerScoreAPI.Tests\CheckerScoreAPI.Tests.csproj", "{759EC400-5620-4F04-A702-83A6E701A240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckerScoreAPI.Tests", "CheckerScoreAPI.Tests\CheckerScoreAPI.Tests.csproj", "{759EC400-5620-4F04-A702-83A6E701A240}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{2216347F-708A-47A8-8936-BE87A2925EB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{5A39765D-2F6A-4585-8C60-C359B867DEE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{759EC400-5620-4F04-A702-83A6E701A240}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{759EC400-5620-4F04-A702-83A6E701A240}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{759EC400-5620-4F04-A702-83A6E701A240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2216347F-708A-47A8-8936-BE87A2925EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2216347F-708A-47A8-8936-BE87A2925EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2216347F-708A-47A8-8936-BE87A2925EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2216347F-708A-47A8-8936-BE87A2925EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A39765D-2F6A-4585-8C60-C359B867DEE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A39765D-2F6A-4585-8C60-C359B867DEE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A39765D-2F6A-4585-8C60-C359B867DEE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A39765D-2F6A-4585-8C60-C359B867DEE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

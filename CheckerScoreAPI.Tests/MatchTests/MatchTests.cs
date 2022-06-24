@@ -1,7 +1,7 @@
 ﻿using CheckerScoreAPI.Controllers;
-using CheckerScoreAPI.Data.Abstracts;
-using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Model.Entity;
+using Domain.Data.Abstracts;
+using Infrastructure.Model;
+using Domain.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;

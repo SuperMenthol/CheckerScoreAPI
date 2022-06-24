@@ -1,8 +1,9 @@
-﻿using CheckerScoreAPI.Commands.MatchCommands;
-using CheckerScoreAPI.Queries.PlayerQueries;
-using CheckerScoreAPI.Data.Abstracts;
-using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Queries.MatchQueries;
+﻿using Domain.Data.Abstracts;
+using Infrastructure.Commands.MatchCommands;
+using Infrastructure.Helpers;
+using Infrastructure.Model;
+using Infrastructure.Queries.MatchQueries;
+using Infrastructure.Queries.PlayerQueries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CheckerScoreAPI.Controllers
@@ -26,12 +27,12 @@ namespace CheckerScoreAPI.Controllers
             {
                 var result = await new GetPlayerResultsQueryAsync(_dataContext, playerId).Get();
 
-                return BaseResponse.GetResponse(true, Helpers.ResponseMessages.RESULTS_SUCCESS, (List<MatchResult>)result.Value);
+                return BaseResponse.GetResponse(true, ResponseMessages.RESULTS_SUCCESS, (List<MatchResult>)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<List<MatchResult>>(false, Helpers.ResponseMessages.RESULTS_FAILURE);
+                return BaseResponse.GetResponse<List<MatchResult>>(false, ResponseMessages.RESULTS_FAILURE);
             }
         }
 
@@ -42,17 +43,17 @@ namespace CheckerScoreAPI.Controllers
             {
                 if (DoesPlayerIDExist(playerId) is false)
                 {
-                    return BaseResponse.GetResponse<PlayerResultModel>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, new());
+                    return BaseResponse.GetResponse<PlayerResultModel>(false, ResponseMessages.PLAYER_ID_INVALID, new());
                 }
 
                 var result = await new GetPlayerResultCardQueryAsync(_dataContext, playerId).Get();
 
-                return BaseResponse.GetResponse(true, Helpers.ResponseMessages.RESULTS_SUCCESS, (PlayerResultModel)result.Value);
+                return BaseResponse.GetResponse(true, ResponseMessages.RESULTS_SUCCESS, (PlayerResultModel)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<PlayerResultModel>(false, Helpers.ResponseMessages.SUMMARY_FAILURE, new());
+                return BaseResponse.GetResponse<PlayerResultModel>(false, ResponseMessages.SUMMARY_FAILURE, new());
             }
         }
 
@@ -63,7 +64,7 @@ namespace CheckerScoreAPI.Controllers
             {
                 if (IsMatchResultValid(matchResult) is false)
                 {
-                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, false);
+                    return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_ID_INVALID, false);
                 }
 
                 var result = await new PostMatchResultCommand(_dataContext, matchResult).Execute();
@@ -73,7 +74,7 @@ namespace CheckerScoreAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.MATCH_POST_FAILURE, false);
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.MATCH_POST_FAILURE, false);
             }
         }
 

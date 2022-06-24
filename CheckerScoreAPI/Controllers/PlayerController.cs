@@ -1,7 +1,8 @@
-﻿using CheckerScoreAPI.Commands.PlayerCommands;
-using CheckerScoreAPI.Data.Abstracts;
-using CheckerScoreAPI.Model;
-using CheckerScoreAPI.Queries.PlayerQueries;
+﻿using Domain.Data.Abstracts;
+using Infrastructure.Commands.PlayerCommands;
+using Infrastructure.Helpers;
+using Infrastructure.Model;
+using Infrastructure.Queries.PlayerQueries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CheckerScoreAPI.Controllers
@@ -26,16 +27,16 @@ namespace CheckerScoreAPI.Controllers
             {
                 if (playerId == 0)
                 {
-                    return BaseResponse.GetResponse<PlayerModel>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, new());
+                    return BaseResponse.GetResponse<PlayerModel>(false, ResponseMessages.PLAYER_ID_INVALID, new());
                 }
 
                 var result = new GetPlayerByIdQuery(_dataContext, playerId).Get();
-                return BaseResponse.GetResponse<PlayerModel>(true, Helpers.ResponseMessages.PLAYER_INFO_SUCCESS, (PlayerModel)result.Value);
+                return BaseResponse.GetResponse<PlayerModel>(true, ResponseMessages.PLAYER_INFO_SUCCESS, (PlayerModel)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<PlayerModel>(false, Helpers.ResponseMessages.PLAYER_INFO_FAILURE, new PlayerModel());
+                return BaseResponse.GetResponse<PlayerModel>(false, ResponseMessages.PLAYER_INFO_FAILURE, new PlayerModel());
             }
         }
 
@@ -46,12 +47,12 @@ namespace CheckerScoreAPI.Controllers
             {
                 var result = new GetPlayerByNameQuery(_dataContext, playerName).Get();
 
-                return BaseResponse.GetResponse<object>(result.Value != null, Helpers.ResponseMessages.LOGIN_SUCCEEDED, new());
+                return BaseResponse.GetResponse<object>(result.Value != null, ResponseMessages.LOGIN_SUCCEEDED, new());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.LOGIN_FAILED, new());
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.LOGIN_FAILED, new());
             }
         }
 
@@ -62,9 +63,9 @@ namespace CheckerScoreAPI.Controllers
             {
                 if (IsPlayerNameAvailable(playerName) is false)
                 {
-                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN);
+                    return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_NAME_TAKEN);
                 }
-                var nameValidationResult = Helpers.Validators.IsPlayerNameValid(playerName);
+                var nameValidationResult = Validators.IsPlayerNameValid(playerName);
                 if (nameValidationResult.Success is false)
                 {
                     return nameValidationResult;
@@ -79,7 +80,7 @@ namespace CheckerScoreAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.CREATE_PLAYER_FAILED);
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.CREATE_PLAYER_FAILED);
             }
         }
 
@@ -90,12 +91,12 @@ namespace CheckerScoreAPI.Controllers
             {
                 if (player.PlayerId == 0 || DoesPlayerIDExist(player.PlayerId) is false)
                 {
-                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID);
+                    return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_ID_INVALID);
                 }
 
                 if (IsPlayerNameAvailable(player.PlayerName) is false)
                 {
-                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN);
+                    return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_NAME_TAKEN);
                 }
 
                 var validateName = ValidatePlayerName(player.PlayerName);
@@ -106,12 +107,12 @@ namespace CheckerScoreAPI.Controllers
 
                 var result = await new RenamePlayerCommand(_dataContext, player).Execute();
 
-                return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED, true);
+                return BaseResponse.GetResponse<object>(true, ResponseMessages.RENAME_PLAYER_SUCCEEDED, true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_RENAME_FAILURE, false);
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_RENAME_FAILURE, false);
             }
         }
 
@@ -132,16 +133,16 @@ namespace CheckerScoreAPI.Controllers
 
             if (nameAvailable is false)
             {
-                return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.PLAYER_NAME_TAKEN, false);
+                return BaseResponse.GetResponse<object>(true, ResponseMessages.PLAYER_NAME_TAKEN, false);
             }
 
-            var nameValidationResult = Helpers.Validators.IsPlayerNameValid(name);
+            var nameValidationResult = Validators.IsPlayerNameValid(name);
             if (nameValidationResult.Success is false || nameAvailable is false)
             {
                 return nameValidationResult;
             }
 
-            return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE, true);
+            return BaseResponse.GetResponse<object>(true, ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE, true);
         }
 
         private bool IsPlayerNameAvailable(string playerName) => new GetPlayerByNameQuery(_dataContext, playerName).Get().StatusCode == StatusCodes.Status417ExpectationFailed;
