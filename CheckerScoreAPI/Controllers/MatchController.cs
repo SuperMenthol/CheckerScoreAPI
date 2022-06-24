@@ -20,61 +20,60 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpGet("getMatchResults")]
-        public async Task<ObjectResult> GetPlayerResults(int playerId)
+        public async Task<BaseResponse<List<MatchResult>>> GetPlayerResults(int playerId)
         {
             try
             {
-                return await new GetPlayerResultsQueryAsync(_dataContext, playerId).Get();
+                var result = await new GetPlayerResultsQueryAsync(_dataContext, playerId).Get();
+
+                return BaseResponse.GetResponse(true, Helpers.ResponseMessages.RESULTS_SUCCESS, (List<MatchResult>)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(
-                    new BaseResponse(false, Helpers.ResponseMessages.RESULTS_FAILURE))
-                    {
-                        StatusCode = StatusCodes.Status500InternalServerError
-                    };
+                return BaseResponse.GetResponse<List<MatchResult>>(false, Helpers.ResponseMessages.RESULTS_FAILURE);
             }
         }
 
         [HttpGet("getPlayerSummary")]
-        public async Task<ObjectResult> GetPlayerSummary(int playerId)
+        public async Task<BaseResponse<PlayerResultModel>> GetPlayerSummary(int playerId)
         {
             try
             {
                 if (DoesPlayerIDExist(playerId) is false)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return BaseResponse.GetResponse<PlayerResultModel>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, new());
                 }
-                return await new GetPlayerResultCardQueryAsync(_dataContext, playerId).Get();
+
+                var result = await new GetPlayerResultCardQueryAsync(_dataContext, playerId).Get();
+
+                return BaseResponse.GetResponse(true, Helpers.ResponseMessages.RESULTS_SUCCESS, (PlayerResultModel)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(
-                    new BaseResponse(false, Helpers.ResponseMessages.SUMMARY_FAILURE)) 
-                        { 
-                            StatusCode = StatusCodes.Status500InternalServerError 
-                        };
+                return BaseResponse.GetResponse<PlayerResultModel>(false, Helpers.ResponseMessages.SUMMARY_FAILURE, new());
             }
         }
 
         [HttpPost("postresult")]
-        public async Task<ObjectResult> PostMatchResult([FromBody] MatchResult result)
+        public async Task<BaseResponse<object>> PostMatchResult([FromBody] MatchResult matchResult)
         {
             try
             {
-                if (IsMatchResultValid(result) is false)
+                if (IsMatchResultValid(matchResult) is false)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, false);
                 }
 
-                return await new PostMatchResultCommand(_dataContext, result).Execute();
+                var result = await new PostMatchResultCommand(_dataContext, matchResult).Execute();
+
+                return (BaseResponse<object>)result.Value;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.MATCH_POST_FAILURE));
+                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.MATCH_POST_FAILURE, false);
             }
         }
 

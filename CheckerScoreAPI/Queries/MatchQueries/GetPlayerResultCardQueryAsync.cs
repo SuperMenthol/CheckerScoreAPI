@@ -22,11 +22,11 @@ namespace CheckerScoreAPI.Queries.MatchQueries
 
         public override async Task<ObjectResult> Get()
         {
-            Player playerInfo = (Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
+            var playerInfo = (Player)new GetPlayerByIdQuery(_dataContext, _playerId).Get().Value;
 
             if (playerInfo == null)
             {
-                return new ObjectResult(null);
+                return new ObjectResult(new PlayerModel()) { StatusCode = StatusCodes.Status417ExpectationFailed };
             }
 
             var resultModel = new PlayerResultModel()

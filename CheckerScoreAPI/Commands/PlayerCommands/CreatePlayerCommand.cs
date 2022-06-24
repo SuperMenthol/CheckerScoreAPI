@@ -20,7 +20,7 @@ namespace CheckerScoreAPI.Commands.PlayerCommands
 
             await _dataContext.Players.InsertOneAsync(player);
 
-            return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.CREATE_PLAYER_SUCCEEDED));
+            return new ObjectResult(BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.CREATE_PLAYER_SUCCEEDED));
         }
     }
 }

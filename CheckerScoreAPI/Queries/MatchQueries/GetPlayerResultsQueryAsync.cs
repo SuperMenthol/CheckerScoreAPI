@@ -21,9 +21,11 @@ namespace CheckerScoreAPI.Queries.MatchQueries
 
         public override async Task<ObjectResult> Get()
         {
+            var resultList = new List<MatchResult>();
+
             var playerResults = await _dataContext.Results.FindAsync(_filter).Result.ToListAsync();
 
-            var dtoList = playerResults.OrderByDescending(x => x.PlayedAt).Select(x => new MatchResult()
+            resultList = playerResults.OrderByDescending(x => x.PlayedAt).Select(x => new MatchResult()
             {
                 MatchTime = x.PlayedAt,
                 Player1Id = x.PlayerOneId,
@@ -31,7 +33,7 @@ namespace CheckerScoreAPI.Queries.MatchQueries
                 WinnerID = x.WinnerId
             }).ToList();
 
-            return new ObjectResult(dtoList);
+            return new ObjectResult(resultList);
         }
     }
 }

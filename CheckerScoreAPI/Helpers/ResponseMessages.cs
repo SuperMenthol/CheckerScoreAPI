@@ -6,6 +6,7 @@
         public const string CREATE_PLAYER_SUCCEEDED = "Player created successfully";
 
         public const string LOGIN_FAILED = "Login failed";
+        public static string LOGIN_SUCCEEDED = "Login successful";
 
         public const string RENAME_PLAYER_SUCCEEDED = "Player successfully renamed";
 
@@ -23,7 +24,10 @@
         public const string PLAYER_RENAME_FAILURE = "Renaming was not successful.";
 
         public const string PLAYER_INFO_FAILURE = "Retrieving player information was not successful.";
+        public const string PLAYER_INFO_SUCCESS = "Successful player info retrieval";
         public const string SUMMARY_FAILURE = "Retrieving player summary did not succeed.";
+
         public const string RESULTS_FAILURE = "Retrieving match results did not succeed.";
+        public static string RESULTS_SUCCESS = "Results for player retrieved successfully";
     }
 }

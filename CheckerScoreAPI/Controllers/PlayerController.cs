@@ -20,121 +20,119 @@ namespace CheckerScoreAPI.Controllers
         }
 
         [HttpGet("getInfo")]
-        public ObjectResult GetPlayerInfo(int playerId)
+        public BaseResponse<PlayerModel> GetPlayerInfo(int playerId)
         {
             try
             {
                 if (playerId == 0)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return BaseResponse.GetResponse<PlayerModel>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID, new());
                 }
 
-                return new GetPlayerByIdQuery(_dataContext, playerId).Get();
+                var result = new GetPlayerByIdQuery(_dataContext, playerId).Get();
+                return BaseResponse.GetResponse<PlayerModel>(true, Helpers.ResponseMessages.PLAYER_INFO_SUCCESS, (PlayerModel)result.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_INFO_FAILURE))
-                    {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                    };
+                return BaseResponse.GetResponse<PlayerModel>(false, Helpers.ResponseMessages.PLAYER_INFO_FAILURE, new PlayerModel());
             }
         }
 
         [HttpGet("login")]
-        public async Task<ObjectResult> Login(string playerName)
+        public BaseResponse<object> Login(string playerName)
         {
             try
             {
-                return new GetPlayerByNameQuery(_dataContext, playerName).Get();
+                var result = new GetPlayerByNameQuery(_dataContext, playerName).Get();
+
+                return BaseResponse.GetResponse<object>(result.Value != null, Helpers.ResponseMessages.LOGIN_SUCCEEDED, new());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.LOGIN_FAILED));
+                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.LOGIN_FAILED, new());
             }
         }
 
         [HttpPost("create")]
-        public async Task<ObjectResult> CreatePlayer(string playerName)
+        public async Task<BaseResponse<object>> CreatePlayer(string playerName)
         {
             try
             {
                 if (IsPlayerNameAvailable(playerName) is false)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
+                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN);
                 }
                 var nameValidationResult = Helpers.Validators.IsPlayerNameValid(playerName);
                 if (nameValidationResult.Success is false)
                 {
-                    return new ObjectResult(nameValidationResult);
+                    return nameValidationResult;
                 }
 
                 int nextPlayerId = (int)new GetNextPlayerIDQuery(_dataContext).Get().Value;
 
-                return await new CreatePlayerCommand(_dataContext, new PlayerModel(nextPlayerId, playerName, DateTime.Now)).Execute();
+                var result = await new CreatePlayerCommand(_dataContext, new PlayerModel(nextPlayerId, playerName, DateTime.Now)).Execute();
+
+                return (BaseResponse<object>)result.Value;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.CREATE_PLAYER_FAILED))
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.CREATE_PLAYER_FAILED);
             }
         }
 
         [HttpPut("rename")]
-        public async Task<ObjectResult> RenamePlayer([FromBody] PlayerModel player)
+        public async Task<BaseResponse<object>> RenamePlayer([FromBody] PlayerModel player)
         {
             try
             {
                 if (player.PlayerId == 0 || DoesPlayerIDExist(player.PlayerId) is false)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_ID_INVALID);
                 }
 
                 if (IsPlayerNameAvailable(player.PlayerName) is false)
                 {
-                    return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN));
+                    return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN);
                 }
 
                 var validateName = ValidatePlayerName(player.PlayerName);
                 if (validateName.Success is false)
                 {
-                    return new ObjectResult(validateName);
+                    return validateName;
                 }
 
-                return await new RenamePlayerCommand(_dataContext, player).Execute();
+                var result = await new RenamePlayerCommand(_dataContext, player).Execute();
+
+                return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED, true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_RENAME_FAILURE))
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return BaseResponse.GetResponse<object>(false, Helpers.ResponseMessages.PLAYER_RENAME_FAILURE, false);
             }
         }
 
-        [HttpDelete("remove")]
-        public ObjectResult RemovePlayer(int playerId)
-        {
-            if (DoesPlayerIDExist(playerId) is false)
-            {
-                return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
-            }
+        //[HttpDelete("remove")]
+        //public ObjectResult RemovePlayer(int playerId)
+        //{
+        //    if (DoesPlayerIDExist(playerId) is false)
+        //    {
+        //        return new ObjectResult(new BaseResponse(false, Helpers.ResponseMessages.PLAYER_ID_INVALID));
+        //    }
 
-            return new ObjectResult(new object());
-        }
+        //    return new ObjectResult(new object());
+        //}
 
-        private BaseResponse ValidatePlayerName(string name)
+        private BaseResponse<object> ValidatePlayerName(string name)
         {
             var nameAvailable = IsPlayerNameAvailable(name);
 
             if (nameAvailable is false)
             {
-                return new BaseResponse(false, Helpers.ResponseMessages.PLAYER_NAME_TAKEN);
+                return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.PLAYER_NAME_TAKEN, false);
             }
 
             var nameValidationResult = Helpers.Validators.IsPlayerNameValid(name);
@@ -143,10 +141,10 @@ namespace CheckerScoreAPI.Controllers
                 return nameValidationResult;
             }
 
-            return new BaseResponse(true, Helpers.ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE);
+            return BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE, true);
         }
 
-        private bool IsPlayerNameAvailable(string playerName) => new GetPlayerByNameQuery(_dataContext, playerName).Get().Value == null;
+        private bool IsPlayerNameAvailable(string playerName) => new GetPlayerByNameQuery(_dataContext, playerName).Get().StatusCode == StatusCodes.Status417ExpectationFailed;
 
         private bool DoesPlayerIDExist(int playerId) => new GetPlayerByIdQuery(_dataContext, playerId).Get().Value != null;
     }

@@ -24,7 +24,7 @@ namespace CheckerScoreAPI.Queries.PlayerQueries
                 return new ObjectResult(new PlayerModel(player));
             }
 
-            return new ObjectResult(null);
+            return new ObjectResult(new PlayerModel()) { StatusCode = StatusCodes.Status417ExpectationFailed };
         }
     }
 }

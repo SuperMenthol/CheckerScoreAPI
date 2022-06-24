@@ -23,7 +23,7 @@ namespace CheckerScoreAPI.Commands.PlayerCommands
 
             await _dataContext.Players.UpdateOneAsync(_filter, upd.Combine());
 
-            return new ObjectResult(new BaseResponse(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
+            return new ObjectResult(BaseResponse.GetResponse<object>(true, Helpers.ResponseMessages.RENAME_PLAYER_SUCCEEDED));
         }
 
         private FilterDefinition<Player> _filter => Builders<Player>.Filter.Where(x => x.PlayerId == _playerModel.PlayerId);

@@ -9,24 +9,24 @@ namespace CheckerScoreAPI.Helpers
 
         private const int playerNameMaxLength = 20;
 
-        public static BaseResponse IsPlayerNameValid(string playerName)
+        public static BaseResponse<object> IsPlayerNameValid(string playerName)
         {
             if (string.IsNullOrWhiteSpace(playerName))
             {
-                return new BaseResponse(false, ResponseMessages.PLAYER_NAME_TOO_SHORT);
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_NAME_TOO_SHORT, new());
             }
 
             if (playerName.Length > playerNameMaxLength)
             {
-                return new BaseResponse(false, string.Format(ResponseMessages.PLAYER_NAME_TOO_LONG, playerNameMaxLength));
+                return BaseResponse.GetResponse<object>(false, string.Format(ResponseMessages.PLAYER_NAME_TOO_LONG, playerNameMaxLength), new());
             }
 
             if (Regex.Matches(playerName, NAME_REGEX).Count > 0)
             {
-                return new BaseResponse(false, ResponseMessages.PLAYER_INVALID_CHARACTERS);
+                return BaseResponse.GetResponse<object>(false, ResponseMessages.PLAYER_INVALID_CHARACTERS, new());
             }
 
-            return new BaseResponse(true, ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE);
+            return BaseResponse.GetResponse<object>(true, ResponseMessages.PLAYER_NAME_SUCCESS_MESSAGE, new());
         }
     }
 }

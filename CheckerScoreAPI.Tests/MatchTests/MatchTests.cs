@@ -74,7 +74,7 @@ namespace CheckerScoreAPI.Tests.MatchTests
             matchMock.Object.InsertMany(_resultList);
 
             mockContext.Setup(x => x.Players).Returns(playerMock.Object);
-            mockContext.Setup(x => x.Results).Returns(matchMock.Object);
+            mockContext.Setup(x => x.Results).Returns(matchMock.Object); // to do, somehow it doesn't work and collection is null
 
             _matchController = new MatchController(new Mock<ILogger<MatchController>>().Object, mockContext.Object);
         }
@@ -84,10 +84,9 @@ namespace CheckerScoreAPI.Tests.MatchTests
         {
             var playerId = 3;
 
-            ObjectResult result = await _matchController.GetPlayerResults(playerId);
-            List<MatchResult> results = (List<MatchResult>)result.Value;
+            var result = await _matchController.GetPlayerResults(playerId);
 
-            Assert.Equals(results.Count, 1);
+            Assert.Equals(result.Result.Count, 1);
         }
     }
 }

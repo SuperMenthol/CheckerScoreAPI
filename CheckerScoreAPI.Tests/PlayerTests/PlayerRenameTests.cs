@@ -45,9 +45,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             };
 
             var action = await _playerController.RenamePlayer(playerModel);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse((bool)action.Result);
         }
 
         [Test]
@@ -56,9 +55,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             var playerModel = new PlayerModel(1, "usertwo", DateTime.Now);
 
             var action = await _playerController.RenamePlayer(playerModel);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse((bool)action.Result);
         }
 
         [Test]
@@ -67,9 +65,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             var playerModel = new PlayerModel(1, "notvבְname", DateTime.Now);
 
             var action = await _playerController.RenamePlayer(playerModel);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse((bool)action.Result);
         }
 
         [Test]
@@ -78,9 +75,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             var playerModel = new PlayerModel(1, string.Empty, DateTime.Now);
 
             var action = await _playerController.RenamePlayer(playerModel);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse((bool)action.Result);
         }
 
         [Test]
@@ -89,9 +85,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             var playerModel = new PlayerModel(3, "newname", DateTime.Now);
 
             var action = await _playerController.RenamePlayer(playerModel);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsTrue((bool)action.Result);
         }
     }
 }

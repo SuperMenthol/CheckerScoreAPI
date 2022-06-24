@@ -41,9 +41,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             string playerName = "Playernamelongerthantwentycharacters";
 
             var action = await _playerController.CreatePlayer(playerName);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse(action.Success);
         }
 
         [Test]
@@ -52,9 +51,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             string playerName = "testαuser";
 
             var action = await _playerController.CreatePlayer(playerName);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse(action.Success);
         }
 
         [Test]
@@ -63,20 +61,18 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             string playerName = "userone";
 
             var action = await _playerController.CreatePlayer(playerName);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse(action.Success);
         }
 
         [Test]
-        public async Task AddingNewPlayerWithEmptyName_ShouldBe_True()
+        public async Task AddingNewPlayerWithEmptyName_ShouldBe_False()
         {
             string playerName = string.Empty;
 
             var action = await _playerController.CreatePlayer(playerName);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse(action.Success);
         }
 
         [Test]
@@ -85,9 +81,8 @@ namespace CheckerScoreAPI.Tests.PlayerTests
             string playerName = "newname1234";
 
             var action = await _playerController.CreatePlayer(playerName);
-            BaseResponse response = (BaseResponse)action.Value;
 
-            Assert.IsFalse(response.Success);
+            Assert.IsFalse(action.Success);
         }
     }
 }
